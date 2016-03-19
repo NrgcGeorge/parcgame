@@ -37,6 +37,7 @@ namespace PlaneCrush
                 dataFromClient = Encoding.ASCII.GetString(bytesFrom);
 
                 msg("Client - " + clientName + ": " + dataFromClient);
+                broadcastMsg(clientName, dataFromClient);
             }
         }
 
@@ -46,13 +47,13 @@ namespace PlaneCrush
             Console.WriteLine(">> " + ms);
         }
 
-        private void broadcastMsg(string uName, string msg, bool flag)
+        private void broadcastMsg(string uName, string msg)
         {
             foreach (DictionaryEntry client in clientsList)
             {
                 TcpClient broadcastSocket = (TcpClient)client.Value;
                 NetworkStream broadcastStream = broadcastSocket.GetStream();
-                Byte[] broadcastBytes = flag ? Encoding.ASCII.GetBytes(uName + ": " + msg) : Encoding.ASCII.GetBytes(msg);
+                Byte[] broadcastBytes = Encoding.ASCII.GetBytes(uName + ": " + msg);
 
                 broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
                 broadcastStream.Flush();
