@@ -23,6 +23,12 @@ namespace PlaneCrash
         public MainWindow()
         {
             InitializeComponent();
+            WindowState = WindowState.Maximized;
+        }
+
+        private void RotateLeft_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
