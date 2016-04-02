@@ -8,11 +8,11 @@ namespace PlaneCrush
 {
     class Server
     {
-        String ServerIP = "127.0.0.1";
+        String ServerIP = "192.168.0.169";
         int ServerPort = 7890;
         TcpListener serverSocket;
         TcpClient clientSocket;
-        Hashtable clientsList = new Hashtable();
+        static Hashtable clientsList = new Hashtable();
 
         public void startServer()
         {
@@ -22,26 +22,46 @@ namespace PlaneCrush
             listen();
         }
 
-        public void listen() {
+        public void listen()
+        {
             while (true) {
                 clientSocket = serverSocket.AcceptTcpClient();
                 NetworkStream networkStream = clientSocket.GetStream();
-                Byte [] bytesFrom = new byte[clientSocket.ReceiveBufferSize];
-                String dataFromClient;
+                Byte[] welomeMsg = Encoding.ASCII.GetBytes("You are conected to the server!");
 
-                networkStream.Read(bytesFrom, 0, clientSocket.ReceiveBufferSize);
-                dataFromClient = Encoding.ASCII.GetString(bytesFrom);
+                clientsList.Add(clientSocket.Client.RemoteEndPoint.ToString(), clientSocket);
 
-                clientsList.Add(dataFromClient, clientSocket);
+                networkStream.Write(welomeMsg, 0 , welomeMsg.Length);
+                msg(clientSocket.Client.RemoteEndPoint.ToString() + " has connected");
+                HandleClient client = new HandleClient(clientSocket, clientSocket.Client.RemoteEndPoint.ToString());
 
-                msg(dataFromClient + " has connected");
-                HandleClient client = new HandleClient(clientSocket, dataFromClient, clientsList);
+                if (clientsList.Count < 2)
+                {
+                    Byte[] waitMesg = Encoding.ASCII.GetBytes("Wait until the other player has conected!");
+                    networkStream.Write(waitMesg, 0, waitMesg.Length);
+                }
             }
         }
 
         private void msg(String ms) {
             ms.Trim();
             Console.WriteLine(">> " + ms);
+        }
+
+        public static void broadcastMsg(string uName, string msg)
+        {
+            foreach (DictionaryEntry client in clientsList)
+            {
+                if (!client.Value.Equals(uName) && clientsList.Count > 1)
+                {
+                    TcpClient broadcastSocket = (TcpClient)client.Value;
+                    NetworkStream broadcastStream = broadcastSocket.GetStream();
+                    Byte[] broadcastBytes = Encoding.ASCII.GetBytes(uName + ": " + msg);
+
+                    broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
+                    broadcastStream.Flush();
+                }
+            }
         }
     }
 }
