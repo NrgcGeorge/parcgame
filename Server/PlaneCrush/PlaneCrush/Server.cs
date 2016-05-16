@@ -27,18 +27,18 @@ namespace PlaneCrush
             while (true) {
                 clientSocket = serverSocket.AcceptTcpClient();
                 NetworkStream networkStream = clientSocket.GetStream();
-                Byte[] welomeMsg = Encoding.ASCII.GetBytes("You are conected to the server!");
+                Byte[] welcomeMsg = Encoding.ASCII.GetBytes("You are conected to the server!");
 
                 clientsList.Add(clientSocket.Client.RemoteEndPoint.ToString(), clientSocket);
                 
-                networkStream.Write(welomeMsg, 0 , welomeMsg.Length);
+               // networkStream.Write(welcomeMsg, 0 , welcomeMsg.Length);
                 msg(clientSocket.Client.RemoteEndPoint.ToString() + " has connected");
                 HandleClient client = new HandleClient(clientSocket, clientSocket.Client.RemoteEndPoint.ToString());
 
                 if (clientsList.Count < 2)
                 {
                     Byte[] waitMesg = Encoding.ASCII.GetBytes("Wait until the other player has conected!");
-                    networkStream.Write(waitMesg, 0, waitMesg.Length);
+            //        networkStream.Write(waitMesg, 0, waitMesg.Length);
                 }
             }
         }
@@ -48,19 +48,18 @@ namespace PlaneCrush
             Console.WriteLine(">> " + ms);
         }
 
-        public static void broadcastMsg(string uName, string msg)
+        public static void broadcastMsg(string uName, byte[] byteMsg)
         {
             foreach (DictionaryEntry client in clientsList)
             {
-                if (!client.Value.Equals(uName) && clientsList.Count > 1)
-                {
+                //if (!client.Value.Equals(uName) && clientsList.Count > 1)
+                //{
                     TcpClient broadcastSocket = (TcpClient)client.Value;
                     NetworkStream broadcastStream = broadcastSocket.GetStream();
-                    Byte[] broadcastBytes = Encoding.ASCII.GetBytes(uName + ": " + msg);
 
-                    broadcastStream.Write(broadcastBytes, 0, broadcastBytes.Length);
+                    broadcastStream.Write(byteMsg, 0, byteMsg.Length);
                     broadcastStream.Flush();
-                }
+                //}
             }
         }
     }

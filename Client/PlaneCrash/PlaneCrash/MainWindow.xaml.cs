@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +26,7 @@ namespace PlaneCrash
     public partial class MainWindow : Window
     {
         public Direction PlaneDirection { get; set; }
+        public NetworkStream Stream;
 
         public MainWindow()
         {
@@ -39,9 +43,9 @@ namespace PlaneCrash
                 Int32 port = 9000;
                 TcpClient client = new TcpClient(server, port);
                
-                NetworkStream stream = client.GetStream();
+                Stream = client.GetStream();
 
-                Thread oThread = new Thread(()=> Listen(stream));
+                Thread oThread = new Thread(Listen);
                 oThread.Start();
             }
             catch (ArgumentNullException e)
@@ -55,16 +59,46 @@ namespace PlaneCrash
             }       
         }
 
-        public void Listen(NetworkStream stream)
+        public void Listen()
         {
             while (true) {
                 Byte[] data = new Byte[256];
-                String responseData = String.Empty;
 
-                Int32 bytes = stream.Read(data, 0, data.Length);
-                responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-                Console.WriteLine("Received: {0}", responseData);
+                Stream.Read(data, 0, data.Length);
+                Class1 responseData = ByteArrayToObject(data);
+                Console.WriteLine(responseData.x);
             }
+        }
+
+        public void SendMessage(String message)
+        {
+            // Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+            //  Stream.Write(data, 0, data.Length);
+            Byte[]  data = ObjectToByteArray(new Class1());
+            Stream.Write(data, 0, data.Length);
+        }
+
+        private Class1 ByteArrayToObject(byte[] arrBytes)
+        {
+            Class1 ReturnValue;
+            using (var _MemoryStream = new MemoryStream(arrBytes))
+            {
+                IFormatter _BinaryFormatter = new BinaryFormatter();
+                ReturnValue = (Class1)_BinaryFormatter.Deserialize(_MemoryStream);
+            }
+            return ReturnValue;
+        }
+
+        public byte[] ObjectToByteArray(Class1 obj)
+        {
+            byte[] bytes;
+            using (var _MemoryStream = new MemoryStream())
+            {
+                IFormatter _BinaryFormatter = new BinaryFormatter();
+                _BinaryFormatter.Serialize(_MemoryStream, obj);
+                bytes = _MemoryStream.ToArray();
+            }
+            return bytes;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -77,6 +111,7 @@ namespace PlaneCrash
         {
             PlaneImage.RenderTransform = new RotateTransform(-90);
             PlaneDirection = Direction.Left;
+            SendMessage("RotateLeft_Click");
         }
 
         private void RotateDownClick(object sender, RoutedEventArgs e)

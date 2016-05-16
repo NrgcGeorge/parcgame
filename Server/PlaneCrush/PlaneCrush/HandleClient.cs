@@ -29,15 +29,13 @@ namespace PlaneCrush
             while (true) {
                 NetworkStream networkStream = clientSocket.GetStream();
                 Byte[] bytesFrom = new byte[clientSocket.Available];
-                String dataFromClient;
 
                 try
                 {
                     networkStream.Read(bytesFrom, 0, clientSocket.Available);
-                    dataFromClient = Encoding.ASCII.GetString(bytesFrom);
 
-                    msg("Client - " + clientName + ": " + dataFromClient);
-                    Server.broadcastMsg(clientName, dataFromClient);
+                    msg("Client - " + clientName + ": object");
+                    Server.broadcastMsg(clientName, bytesFrom);
                 }
                 catch (Exception) {
                 }
