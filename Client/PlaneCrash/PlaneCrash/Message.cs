@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace PlaneCrash
 {
     [Serializable]
-    public class Class1
+    public class Message
     {
-        public int x = 8;
-        String z = "Geani";
+        public int CellToHit { get; set; }
+        public bool Atacker { get; set; }
     }
 }

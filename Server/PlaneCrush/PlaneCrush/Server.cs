@@ -31,15 +31,9 @@ namespace PlaneCrush
 
                 clientsList.Add(clientSocket.Client.RemoteEndPoint.ToString(), clientSocket);
                 
-               // networkStream.Write(welcomeMsg, 0 , welcomeMsg.Length);
                 msg(clientSocket.Client.RemoteEndPoint.ToString() + " has connected");
                 HandleClient client = new HandleClient(clientSocket, clientSocket.Client.RemoteEndPoint.ToString());
 
-                if (clientsList.Count < 2)
-                {
-                    Byte[] waitMesg = Encoding.ASCII.GetBytes("Wait until the other player has conected!");
-            //        networkStream.Write(waitMesg, 0, waitMesg.Length);
-                }
             }
         }
 
@@ -52,14 +46,14 @@ namespace PlaneCrush
         {
             foreach (DictionaryEntry client in clientsList)
             {
-                //if (!client.Value.Equals(uName) && clientsList.Count > 1)
-                //{
+                if (!client.Value.Equals(uName) && clientsList.Count > 1)
+                {
                     TcpClient broadcastSocket = (TcpClient)client.Value;
                     NetworkStream broadcastStream = broadcastSocket.GetStream();
 
                     broadcastStream.Write(byteMsg, 0, byteMsg.Length);
                     broadcastStream.Flush();
-                //}
+                }
             }
         }
     }

@@ -59,37 +59,35 @@ namespace PlaneCrash
             }       
         }
 
+        #region process server messages
         public void Listen()
         {
             while (true) {
                 Byte[] data = new Byte[256];
 
                 Stream.Read(data, 0, data.Length);
-                Class1 responseData = ByteArrayToObject(data);
-                Console.WriteLine(responseData.x);
+                Message responseData = ByteArrayToObject(data);
             }
         }
 
-        public void SendMessage(String message)
+        public void SendMessage(Message message)
         {
-            // Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
-            //  Stream.Write(data, 0, data.Length);
-            Byte[]  data = ObjectToByteArray(new Class1());
+            Byte[]  data = ObjectToByteArray(message);
             Stream.Write(data, 0, data.Length);
         }
 
-        private Class1 ByteArrayToObject(byte[] arrBytes)
+        private Message ByteArrayToObject(byte[] arrBytes)
         {
-            Class1 ReturnValue;
+            Message ReturnValue;
             using (var _MemoryStream = new MemoryStream(arrBytes))
             {
                 IFormatter _BinaryFormatter = new BinaryFormatter();
-                ReturnValue = (Class1)_BinaryFormatter.Deserialize(_MemoryStream);
+                ReturnValue = (Message)_BinaryFormatter.Deserialize(_MemoryStream);
             }
             return ReturnValue;
         }
 
-        public byte[] ObjectToByteArray(Class1 obj)
+        public byte[] ObjectToByteArray(Message obj)
         {
             byte[] bytes;
             using (var _MemoryStream = new MemoryStream())
@@ -100,6 +98,7 @@ namespace PlaneCrash
             }
             return bytes;
         }
+        #endregion
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -111,7 +110,6 @@ namespace PlaneCrash
         {
             PlaneImage.RenderTransform = new RotateTransform(-90);
             PlaneDirection = Direction.Left;
-            SendMessage("RotateLeft_Click");
         }
 
         private void RotateDownClick(object sender, RoutedEventArgs e)
@@ -158,6 +156,7 @@ namespace PlaneCrash
                     placeHolder.DragEnter += PlaceHolder_DragEnter;
                     placeHolder.AllowDrop = allowDrop;
                     placeHolder.Background = mapColor;
+                    placeHolder.Click += ButtonClick;
 
                     placeHolder.SetValue(Grid.RowProperty, rowIndex);
                     placeHolder.SetValue(Grid.ColumnProperty, columnIndex);
@@ -165,6 +164,13 @@ namespace PlaneCrash
                     gridMap.Children.Add(placeHolder);
                 }
             }
+        }
+
+        private void ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var cb = sender as CustomButton;
+            var hitCellId = Convert.ToInt32(cb.Uid);
+            SendMessage(new Message() { CellToHit = hitCellId , Atacker = true});
         }
 
         private void PlaceHolder_DragEnter(object sender, DragEventArgs e)
