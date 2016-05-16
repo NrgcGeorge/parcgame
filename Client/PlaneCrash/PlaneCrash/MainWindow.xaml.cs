@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +27,44 @@ namespace PlaneCrash
         public MainWindow()
         {
             InitializeComponent();
+            Connect("192.168.0.171");
+            
+        }
+      
+        void Connect(String server)
+        {
+           
+            try
+            {
+                Int32 port = 9000;
+                TcpClient client = new TcpClient(server, port);
+               
+                NetworkStream stream = client.GetStream();
+
+                Thread oThread = new Thread(()=> Listen(stream));
+                oThread.Start();
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine("ArgumentNullException: {0}", e);
+
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }       
+        }
+
+        public void Listen(NetworkStream stream)
+        {
+            while (true) {
+                Byte[] data = new Byte[256];
+                String responseData = String.Empty;
+
+                Int32 bytes = stream.Read(data, 0, data.Length);
+                responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+                Console.WriteLine("Received: {0}", responseData);
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

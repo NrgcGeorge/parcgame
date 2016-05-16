@@ -8,8 +8,8 @@ namespace PlaneCrush
 {
     class Server
     {
-        String ServerIP = "192.168.0.169";
-        int ServerPort = 7890;
+        String ServerIP = "192.168.0.171";
+        int ServerPort = 9000;
         TcpListener serverSocket;
         TcpClient clientSocket;
         static Hashtable clientsList = new Hashtable();
@@ -30,7 +30,7 @@ namespace PlaneCrush
                 Byte[] welomeMsg = Encoding.ASCII.GetBytes("You are conected to the server!");
 
                 clientsList.Add(clientSocket.Client.RemoteEndPoint.ToString(), clientSocket);
-
+                
                 networkStream.Write(welomeMsg, 0 , welomeMsg.Length);
                 msg(clientSocket.Client.RemoteEndPoint.ToString() + " has connected");
                 HandleClient client = new HandleClient(clientSocket, clientSocket.Client.RemoteEndPoint.ToString());
