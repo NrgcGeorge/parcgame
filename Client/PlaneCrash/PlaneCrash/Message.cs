@@ -11,5 +11,7 @@ namespace PlaneCrash
     {
         public int CellToHit { get; set; }
         public bool Atacker { get; set; }
+
+        public bool PlanesReady { get; set; }
     }
 }

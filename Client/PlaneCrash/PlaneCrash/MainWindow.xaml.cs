@@ -44,7 +44,7 @@ namespace PlaneCrash
                 TcpClient client = new TcpClient(server, port);
                
                 Stream = client.GetStream();
-
+                SendMessage(new Message() { PlanesReady = true ,Atacker = false , CellToHit = 0});
                 Thread oThread = new Thread(Listen);
                 oThread.Start();
             }
@@ -209,6 +209,8 @@ namespace PlaneCrash
             }
         }
 
+        static public int NumberOfAddedPlanes = 0;
+
         private void DrawPlane(Direction planeDirection, int headId, bool preview, Brush planeColor)
         {
             try
@@ -220,6 +222,12 @@ namespace PlaneCrash
                         if (!InvalidCoordonateFound(headUpCoord))
                         {
                             CreatePlane(headUpCoord, planeColor, preview);
+                            if (planeColor == Brushes.Yellow) {
+                                NumberOfAddedPlanes++;
+                            }
+                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
+                                SendMessage(new Message() { PlanesReady = true });
+                            }
                         }
                         break;
                     case Direction.Down:
@@ -227,6 +235,13 @@ namespace PlaneCrash
                         if (!InvalidCoordonateFound(headDownCoord))
                         {
                             CreatePlane(headDownCoord, planeColor, preview);
+                            if (planeColor == Brushes.Yellow)
+                            {
+                                NumberOfAddedPlanes++;
+                            }
+                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
+                                SendMessage(new Message() { PlanesReady = true });
+                            }
                         }
                         break;
                     case Direction.Left:
@@ -234,6 +249,13 @@ namespace PlaneCrash
                         if (!InvalidCoordonateFound(headLeftCoord))
                         {
                             CreatePlane(headLeftCoord, planeColor, preview);
+                            if (planeColor == Brushes.Yellow)
+                            {
+                                NumberOfAddedPlanes++;
+                            }
+                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
+                                SendMessage(new Message() { PlanesReady = true });
+                            }
                         }
                         break;
                     case Direction.Right:
@@ -241,6 +263,13 @@ namespace PlaneCrash
                         if (!InvalidCoordonateFound(headRightCoord))
                         {
                             CreatePlane(headRightCoord, planeColor, preview);
+                            if (planeColor == Brushes.Yellow)
+                            {
+                                NumberOfAddedPlanes++;
+                            }
+                            if (NumberOfAddedPlanes == 3 ) {
+                                SendMessage(new Message() { PlanesReady = true});
+                            }
                         }
                         break;
                     default:
