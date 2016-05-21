@@ -75,7 +75,10 @@ namespace PlaneCrush
         }
 
         public static void sendActivePlayerMsg() {
-            MessageWrapper m = new MessageWrapper() { ActivePlayer= Server.activePlayer};
+            MessageWrapper m = new MessageWrapper() {
+                ActivePlayer = Server.activePlayer,
+                Phase = MessageWrapper.Phases.ACKNOWLEDGE
+            };
             Byte[] msg = ObjectToByteArray(m);
             Server.broadcastMsg("server", msg);
 
