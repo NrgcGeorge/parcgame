@@ -32,7 +32,6 @@ namespace PlaneCrash
         {
             InitializeComponent();
             Connect("192.168.0.171");
-            
         }
       
         void Connect(String server)
@@ -44,7 +43,7 @@ namespace PlaneCrash
                 TcpClient client = new TcpClient(server, port);
                
                 Stream = client.GetStream();
-                SendMessage(new Message() { PlanesReady = true ,Atacker = false , CellToHit = 0});
+               
                 Thread oThread = new Thread(Listen);
                 oThread.Start();
             }
@@ -66,8 +65,17 @@ namespace PlaneCrash
                 Byte[] data = new Byte[256];
 
                 Stream.Read(data, 0, data.Length);
+
+             //   string responseMsg = Encoding.ASCII.GetString(data);
+
                 Message responseData = ByteArrayToObject(data);
             }
+        }
+
+        public void SendMessage(string message)
+        {
+            Byte[] data = Encoding.ASCII.GetBytes(message);
+            Stream.Write(data, 0, data.Length);
         }
 
         public void SendMessage(Message message)
@@ -226,7 +234,7 @@ namespace PlaneCrash
                                 NumberOfAddedPlanes++;
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
-                                SendMessage(new Message() { PlanesReady = true });
+                                SendMessage("planes_ready");
                             }
                         }
                         break;
@@ -240,7 +248,7 @@ namespace PlaneCrash
                                 NumberOfAddedPlanes++;
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
-                                SendMessage(new Message() { PlanesReady = true });
+                                SendMessage("planes_ready");
                             }
                         }
                         break;
@@ -254,7 +262,7 @@ namespace PlaneCrash
                                 NumberOfAddedPlanes++;
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
-                                SendMessage(new Message() { PlanesReady = true });
+                                SendMessage("planes_ready");
                             }
                         }
                         break;
@@ -268,7 +276,7 @@ namespace PlaneCrash
                                 NumberOfAddedPlanes++;
                             }
                             if (NumberOfAddedPlanes == 3 ) {
-                                SendMessage(new Message() { PlanesReady = true});
+                                SendMessage("planes_ready");
                             }
                         }
                         break;
