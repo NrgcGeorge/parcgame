@@ -75,6 +75,11 @@ namespace PlaneCrash
 
                 MessageWrapper responseData = ByteArrayToObject(data);
 
+
+                if (responseData.Phase == MessageWrapper.Phases.SENDIP) {
+                    ClientName = responseData.YourName;
+                }
+
                 if (responseData.Phase == MessageWrapper.Phases.ACKNOWLEDGE)
                 {
                     if (responseData.ActivePlayer == ClientName)
@@ -100,7 +105,8 @@ namespace PlaneCrash
                                 if (button.IsHead == true)
                                 {
                                     // to do
-                                    var a = 2;
+                                    button.Background = Brushes.Black;
+                                    ;
                                 }
                                 else
                                 {
