@@ -97,6 +97,7 @@ namespace PlaneCrash
                 if (responseData.Phase == MessageWrapper.Phases.ATACK)
                 {
                     int[] points = new int[8];
+                    points[0] = responseData.CellToHit;
                     bool isPlaneHit = false;
                     this.Dispatcher.Invoke((Action)(() =>
                     {
@@ -136,14 +137,37 @@ namespace PlaneCrash
                                 }
                             }
                         }
-
                     }));
 
-                    SendMessage(new MessageWrapper() { Points = points , IsPlaneHit = isPlaneHit , Phase = MessageWrapper.Phases.HIT });
+                    SendMessage(new MessageWrapper() { Points = points, IsPlaneHit = isPlaneHit, Phase = MessageWrapper.Phases.HIT });
+                    ColorPoints(points, SelfPlaneMap, Brushes.Black);
+                }
 
+                if (responseData.Phase == MessageWrapper.Phases.HIT)
+                {
+                    ColorPoints(responseData.Points, HitTargetMap, responseData.IsPlaneHit ? Brushes.Green : Brushes.Pink);
+                    SendMessage(new MessageWrapper() { Phase = MessageWrapper.Phases.LOSE});
                 }
 
             }
+        }
+
+        public void ColorPoints(int[] points, Grid grid, Brush brush)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                foreach (var point in points)
+                {
+                    foreach (var btn in grid.Children)
+                    {
+                        var button = btn as CustomButton;
+                        if (point == Convert.ToInt32(button.Uid))
+                        {
+                            button.Background = brush;
+                        }
+                    }
+                }
+            }));
         }
 
         public void SendMessage(MessageWrapper message)
@@ -547,7 +571,7 @@ namespace PlaneCrash
 
         public int[] GetPoints()
         {
-            return new int[] { HeadId , CellCenterFrontId , CellLeftFrontWingId , CellRightFrontWingId , CellCenterMiddleId , CellLeftBackWingId , CellRightBackWingId };
+            return new int[] { HeadId, CellCenterFrontId, CellLeftFrontWingId, CellRightFrontWingId, CellCenterMiddleId, CellLeftBackWingId, CellRightBackWingId, CellCenterBackId };
         }
 
     }
