@@ -10,14 +10,6 @@ using Wrapper;
 
 namespace PlaneCrush
 {
-    enum Phases
-    {
-        ACKNOWLEDGE,
-        ATACK,
-        HIT,
-        LOSE
-    }
-
     class Server
     {
         String ServerIP = "192.168.0.171";
@@ -28,7 +20,6 @@ namespace PlaneCrush
 
         public static int readyPlayers = 0;
         static string activePlayer;
-        public static Phases phase = Phases.ACKNOWLEDGE;
 
         public void startServer()
         {
@@ -48,13 +39,17 @@ namespace PlaneCrush
                     clientsList.Add(clientSocket.Client.RemoteEndPoint.ToString(), clientSocket);
                     activePlayer = clientSocket.Client.RemoteEndPoint.ToString();
 
+                    MessageWrapper mess = new MessageWrapper() { YourName = activePlayer, Phase = MessageWrapper.Phases.SENDIP};
+                    Byte[] message = ObjectToByteArray(mess);
+                    networkStream.Write(message, 0, message.Length);
+ 
                     msg(clientSocket.Client.RemoteEndPoint.ToString() + " has connected");
                     HandleClient client = new HandleClient(clientSocket, clientSocket.Client.RemoteEndPoint.ToString());
                 }
             }
         }
 
-        private void msg(String ms) {
+        private static void msg(String ms) {
             ms.Trim();
             Console.WriteLine(">> " + ms);
         }
@@ -79,8 +74,10 @@ namespace PlaneCrush
                 ActivePlayer = Server.activePlayer,
                 Phase = MessageWrapper.Phases.ACKNOWLEDGE
             };
-            Byte[] msg = ObjectToByteArray(m);
-            Server.broadcastMsg("server", msg);
+
+            Byte[] message = ObjectToByteArray(m);
+            Server.broadcastMsg("server", message);
+            msg("Active Player: " + Server.activePlayer);
 
             foreach (DictionaryEntry client in clientsList) {
                 if (!client.Key.Equals(Server.activePlayer)) {

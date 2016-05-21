@@ -11,6 +11,7 @@ namespace Wrapper
     {
         public enum Phases
         {
+            SENDIP,
             ACKNOWLEDGE,
             ATACK,
             HIT,
@@ -20,5 +21,6 @@ namespace Wrapper
         public bool PlanesReady { get; set; }
         public string ActivePlayer { get; set; }
         public Phases Phase { get; set; }
+        public string YourName { get; set; }
     }
 }
