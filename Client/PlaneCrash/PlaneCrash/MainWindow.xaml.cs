@@ -30,20 +30,23 @@ namespace PlaneCrash
         public NetworkStream Stream;
         public string ClientName { get; set; }
 
+        public bool IsMyTurn { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
+            IsMyTurn = false;
             Connect("192.168.0.171");
         }
-      
+
         void Connect(String server)
         {
-           
+
             try
             {
                 Int32 port = 9000;
                 TcpClient client = new TcpClient(server, port);
-                
+
                 Stream = client.GetStream();
 
                 ClientName = client.Client.RemoteEndPoint.ToString();
@@ -59,24 +62,38 @@ namespace PlaneCrash
             catch (SocketException e)
             {
                 Console.WriteLine("SocketException: {0}", e);
-            }       
+            }
         }
 
         #region process server messages
         public void Listen()
         {
-            while (true) {
+            while (true)
+            {
                 Byte[] data = new Byte[1024];
 
                 Stream.Read(data, 0, data.Length);
-                
+
                 MessageWrapper responseData = ByteArrayToObject(data);
+
+                if (responseData.Phase == MessageWrapper.Phases.ACKNOWLEDGE)
+                {
+                    if (responseData.ActivePlayer == ClientName)
+                    {
+                        IsMyTurn = true;
+                    }
+                    else
+                    {
+                        IsMyTurn = false;
+
+                    }
+                }
             }
         }
 
         public void SendMessage(MessageWrapper message)
         {
-            Byte[]  data = ObjectToByteArray(message);
+            Byte[] data = ObjectToByteArray(message);
             Stream.Write(data, 0, data.Length);
         }
 
@@ -174,7 +191,7 @@ namespace PlaneCrash
         {
             var cb = sender as CustomButton;
             var hitCellId = Convert.ToInt32(cb.Uid);
-            SendMessage(new MessageWrapper() { CellToHit = hitCellId , Atacker = true});
+            SendMessage(new MessageWrapper() { CellToHit = hitCellId, Phase = MessageWrapper.Phases.ATACK });
         }
 
         private void PlaceHolder_DragEnter(object sender, DragEventArgs e)
@@ -226,10 +243,12 @@ namespace PlaneCrash
                         if (!InvalidCoordonateFound(headUpCoord))
                         {
                             CreatePlane(headUpCoord, planeColor, preview);
-                            if (planeColor == Brushes.Yellow) {
+                            if (planeColor == Brushes.Yellow)
+                            {
                                 NumberOfAddedPlanes++;
                             }
-                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
+                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow)
+                            {
                                 SendMessage(new MessageWrapper() { PlanesReady = true });
                             }
                         }
@@ -243,7 +262,8 @@ namespace PlaneCrash
                             {
                                 NumberOfAddedPlanes++;
                             }
-                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
+                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow)
+                            {
                                 SendMessage(new MessageWrapper() { PlanesReady = true });
                             }
                         }
@@ -257,7 +277,8 @@ namespace PlaneCrash
                             {
                                 NumberOfAddedPlanes++;
                             }
-                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
+                            if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow)
+                            {
                                 SendMessage(new MessageWrapper() { PlanesReady = true });
                             }
                         }
@@ -271,7 +292,8 @@ namespace PlaneCrash
                             {
                                 NumberOfAddedPlanes++;
                             }
-                            if (NumberOfAddedPlanes == 3 ) {
+                            if (NumberOfAddedPlanes == 3)
+                            {
                                 SendMessage(new MessageWrapper() { PlanesReady = true });
                             }
                         }
