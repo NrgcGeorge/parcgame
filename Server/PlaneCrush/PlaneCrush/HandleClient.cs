@@ -30,47 +30,31 @@ namespace PlaneCrush
                 NetworkStream networkStream = clientSocket.GetStream();
                 Byte[] bytesFrom = new byte[clientSocket.Available];
                 networkStream.Read(bytesFrom, 0, clientSocket.Available);
-
+            
                 if (bytesFrom.Length > 0) {
+                    MessageWrapper message = ByteArrayToObject(bytesFrom);
+
                     if (Server.readyPlayers < 2)
                     {
-                        MessageWrapper message = ByteArrayToObject(bytesFrom);
                         if (message.PlanesReady)
                         {
                             Server.readyPlayers++;
                             msg("Client - " + clientName + ": READY");
                         }
                     }
-                    else if (Server.phase != Phases.ACKNOWLEDGE)
+                    else if (message.Phase != MessageWrapper.Phases.ACKNOWLEDGE)
                     {
                         try
                         {
-                            msg("Client - " + clientName + ": object");
+                            msg("Phase: " + message.Phase);
                             Server.broadcastMsg(clientName, bytesFrom);
                         }
                         catch (Exception) { }
-                        finally
-                        {
-                            switch (Server.phase) {
-                                case Phases.ATACK:
-                                    Server.phase = Phases.HIT;
-                                    break;
-                                case Phases.HIT:
-                                    Server.phase = Phases.LOSE;
-                                    break;
-                                case Phases.LOSE:
-                                    Server.phase = Phases.ACKNOWLEDGE;
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
                     }
 
-                    if (Server.readyPlayers == 2 && Server.phase == Phases.ACKNOWLEDGE)
+                    if (message.Phase == MessageWrapper.Phases.ACKNOWLEDGE && Server.readyPlayers == 2)
                     {
                         Server.sendActivePlayerMsg();
-                        Server.phase = Phases.ATACK;
                     }
                 }
             }
