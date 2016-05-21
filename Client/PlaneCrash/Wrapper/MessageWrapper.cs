@@ -22,5 +22,9 @@ namespace Wrapper
         public string ActivePlayer { get; set; }
         public Phases Phase { get; set; }
         public string YourName { get; set; }
+
+        public int[] Points = new int[8];
+
+        public bool IsPlaneHit { get; set; }
     }
 }

@@ -76,7 +76,8 @@ namespace PlaneCrash
                 MessageWrapper responseData = ByteArrayToObject(data);
 
 
-                if (responseData.Phase == MessageWrapper.Phases.SENDIP) {
+                if (responseData.Phase == MessageWrapper.Phases.SENDIP)
+                {
                     ClientName = responseData.YourName;
                 }
 
@@ -95,6 +96,8 @@ namespace PlaneCrash
 
                 if (responseData.Phase == MessageWrapper.Phases.ATACK)
                 {
+                    int[] points = new int[8];
+                    bool isPlaneHit = false;
                     this.Dispatcher.Invoke((Action)(() =>
                     {
                         foreach (var btn in SelfPlaneMap.Children)
@@ -104,18 +107,39 @@ namespace PlaneCrash
                             {
                                 if (button.IsHead == true)
                                 {
-                                    // to do
                                     button.Background = Brushes.Black;
-                                    ;
+                                    switch (button.HeadDirection)
+                                    {
+                                        case Direction.Up:
+                                            points = GetHeadUpPlaneCoord(Convert.ToInt32(button.Uid)).GetPoints();
+                                            break;
+                                        case Direction.Left:
+                                            points = GetHeadLeftPlaneCoord(Convert.ToInt32(button.Uid)).GetPoints();
+                                            break;
+                                        case Direction.Right:
+                                            points = GetHeadRightPlaneCoord(Convert.ToInt32(button.Uid)).GetPoints();
+                                            break;
+                                        case Direction.Down:
+                                            points = GetHeadDownPlaneCoord(Convert.ToInt32(button.Uid)).GetPoints();
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    isPlaneHit = true;
+                                    break;
                                 }
                                 else
                                 {
-                                    var bu = 4;
+                                    button.Background = Brushes.Black;
+                                    isPlaneHit = true;
+                                    break;
                                 }
                             }
                         }
 
                     }));
+
+                    SendMessage(new MessageWrapper() { Points = points , IsPlaneHit = isPlaneHit , Phase = MessageWrapper.Phases.HIT });
 
                 }
 
@@ -273,7 +297,7 @@ namespace PlaneCrash
                         PlaneCoordinates headUpCoord = GetHeadUpPlaneCoord(headId);
                         if (!InvalidCoordonateFound(headUpCoord))
                         {
-                            CreatePlane(headUpCoord, planeColor, preview);
+                            CreatePlane(headUpCoord, planeColor, preview, Direction.Up);
                             if (planeColor == Brushes.Yellow)
                             {
                                 NumberOfAddedPlanes++;
@@ -288,7 +312,7 @@ namespace PlaneCrash
                         PlaneCoordinates headDownCoord = GetHeadDownPlaneCoord(headId);
                         if (!InvalidCoordonateFound(headDownCoord))
                         {
-                            CreatePlane(headDownCoord, planeColor, preview);
+                            CreatePlane(headDownCoord, planeColor, preview, Direction.Down);
                             if (planeColor == Brushes.Yellow)
                             {
                                 NumberOfAddedPlanes++;
@@ -303,7 +327,7 @@ namespace PlaneCrash
                         PlaneCoordinates headLeftCoord = GetHeadLeftPlaneCoord(headId);
                         if (!InvalidCoordonateFound(headLeftCoord))
                         {
-                            CreatePlane(headLeftCoord, planeColor, preview);
+                            CreatePlane(headLeftCoord, planeColor, preview, Direction.Left);
                             if (planeColor == Brushes.Yellow)
                             {
                                 NumberOfAddedPlanes++;
@@ -318,7 +342,7 @@ namespace PlaneCrash
                         PlaneCoordinates headRightCoord = GetHeadRightPlaneCoord(headId);
                         if (!InvalidCoordonateFound(headRightCoord))
                         {
-                            CreatePlane(headRightCoord, planeColor, preview);
+                            CreatePlane(headRightCoord, planeColor, preview, Direction.Right);
                             if (planeColor == Brushes.Yellow)
                             {
                                 NumberOfAddedPlanes++;
@@ -420,13 +444,14 @@ namespace PlaneCrash
             return pCoord;
         }
 
-        private void CreatePlane(PlaneCoordinates planeCoordinates, Brush planeColor, bool preview)
+        private void CreatePlane(PlaneCoordinates planeCoordinates, Brush planeColor, bool preview, Direction direction)
         {
             CustomButton headBtn = GetButtonById(planeCoordinates.HeadId);
             if (headBtn != null)
             {
                 headBtn.Background = planeColor;
                 headBtn.IsHead = true;
+                headBtn.HeadDirection = direction;
 
                 CustomButton cellCenterFrontBtn = GetButtonById(planeCoordinates.CellCenterFrontId);
                 cellCenterFrontBtn.Background = planeColor;
@@ -519,5 +544,11 @@ namespace PlaneCrash
         public int CellCenterBackId { get; set; }
         public int CellLeftBackWingId { get; set; }
         public int CellRightBackWingId { get; set; }
+
+        public int[] GetPoints()
+        {
+            return new int[] { HeadId , CellCenterFrontId , CellLeftFrontWingId , CellRightFrontWingId , CellCenterMiddleId , CellLeftBackWingId , CellRightBackWingId };
+        }
+
     }
 }

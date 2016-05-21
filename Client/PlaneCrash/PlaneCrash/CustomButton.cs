@@ -11,5 +11,6 @@ namespace PlaneCrash
     {
         public bool IsSelected { get; set; }
         public bool IsHead = false;
+        public Direction HeadDirection { get; set; }
     }
 }
