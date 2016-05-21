@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Wrapper;
 
 namespace PlaneCrash
 {
@@ -66,36 +67,35 @@ namespace PlaneCrash
 
                 Stream.Read(data, 0, data.Length);
 
-             //   string responseMsg = Encoding.ASCII.GetString(data);
 
-                Message responseData = ByteArrayToObject(data);
+                MessageWrapper responseData = ByteArrayToObject(data);
             }
         }
 
-        public void SendMessage(string message)
-        {
-            Byte[] data = Encoding.ASCII.GetBytes(message);
-            Stream.Write(data, 0, data.Length);
-        }
+        //public void SendMessage(string message)
+        //{
+        //    Byte[] data = Encoding.ASCII.GetBytes(message);
+        //    Stream.Write(data, 0, data.Length);
+        //}
 
-        public void SendMessage(Message message)
+        public void SendMessage(MessageWrapper message)
         {
             Byte[]  data = ObjectToByteArray(message);
             Stream.Write(data, 0, data.Length);
         }
 
-        private Message ByteArrayToObject(byte[] arrBytes)
+        private MessageWrapper ByteArrayToObject(byte[] arrBytes)
         {
-            Message ReturnValue;
+            MessageWrapper ReturnValue;
             using (var _MemoryStream = new MemoryStream(arrBytes))
             {
                 IFormatter _BinaryFormatter = new BinaryFormatter();
-                ReturnValue = (Message)_BinaryFormatter.Deserialize(_MemoryStream);
+                ReturnValue = (MessageWrapper)_BinaryFormatter.Deserialize(_MemoryStream);
             }
             return ReturnValue;
         }
 
-        public byte[] ObjectToByteArray(Message obj)
+        public byte[] ObjectToByteArray(MessageWrapper obj)
         {
             byte[] bytes;
             using (var _MemoryStream = new MemoryStream())
@@ -178,7 +178,7 @@ namespace PlaneCrash
         {
             var cb = sender as CustomButton;
             var hitCellId = Convert.ToInt32(cb.Uid);
-            SendMessage(new Message() { CellToHit = hitCellId , Atacker = true});
+            SendMessage(new MessageWrapper() { CellToHit = hitCellId , Atacker = true});
         }
 
         private void PlaceHolder_DragEnter(object sender, DragEventArgs e)
@@ -234,7 +234,7 @@ namespace PlaneCrash
                                 NumberOfAddedPlanes++;
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
-                                SendMessage("planes_ready");
+                                SendMessage(new MessageWrapper() { PlanesReady = true });
                             }
                         }
                         break;
@@ -248,7 +248,7 @@ namespace PlaneCrash
                                 NumberOfAddedPlanes++;
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
-                                SendMessage("planes_ready");
+                                SendMessage(new MessageWrapper() { PlanesReady = true });
                             }
                         }
                         break;
@@ -262,7 +262,7 @@ namespace PlaneCrash
                                 NumberOfAddedPlanes++;
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow) {
-                                SendMessage("planes_ready");
+                                SendMessage(new MessageWrapper() { PlanesReady = true });
                             }
                         }
                         break;
@@ -276,7 +276,7 @@ namespace PlaneCrash
                                 NumberOfAddedPlanes++;
                             }
                             if (NumberOfAddedPlanes == 3 ) {
-                                SendMessage("planes_ready");
+                                SendMessage(new MessageWrapper() { PlanesReady = true });
                             }
                         }
                         break;
