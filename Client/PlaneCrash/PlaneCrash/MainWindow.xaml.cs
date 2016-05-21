@@ -28,6 +28,7 @@ namespace PlaneCrash
     {
         public Direction PlaneDirection { get; set; }
         public NetworkStream Stream;
+        public string ClientName { get; set; }
 
         public MainWindow()
         {
@@ -42,9 +43,11 @@ namespace PlaneCrash
             {
                 Int32 port = 9000;
                 TcpClient client = new TcpClient(server, port);
-               
+                
                 Stream = client.GetStream();
-               
+
+                ClientName = client.Client.RemoteEndPoint.ToString();
+
                 Thread oThread = new Thread(Listen);
                 oThread.Start();
             }
@@ -63,20 +66,13 @@ namespace PlaneCrash
         public void Listen()
         {
             while (true) {
-                Byte[] data = new Byte[256];
+                Byte[] data = new Byte[1024];
 
                 Stream.Read(data, 0, data.Length);
-
-
+                
                 MessageWrapper responseData = ByteArrayToObject(data);
             }
         }
-
-        //public void SendMessage(string message)
-        //{
-        //    Byte[] data = Encoding.ASCII.GetBytes(message);
-        //    Stream.Write(data, 0, data.Length);
-        //}
 
         public void SendMessage(MessageWrapper message)
         {
