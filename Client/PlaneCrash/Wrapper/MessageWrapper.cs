@@ -13,5 +13,6 @@ namespace Wrapper
         public bool Atacker { get; set; }
 
         public bool PlanesReady { get; set; }
+        public string ActivePlayer { get; set; }
     }
 }

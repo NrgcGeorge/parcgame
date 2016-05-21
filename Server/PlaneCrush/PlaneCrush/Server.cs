@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using Wrapper;
 
 namespace PlaneCrush
 {
@@ -71,7 +75,8 @@ namespace PlaneCrush
         }
 
         public static void sendActivePlayerMsg() {
-            Byte[] msg = Encoding.ASCII.GetBytes(Server.activePlayer);
+            MessageWrapper m = new MessageWrapper() { ActivePlayer= Server.activePlayer};
+            Byte[] msg = ObjectToByteArray(m);
             Server.broadcastMsg("server", msg);
 
             foreach (DictionaryEntry client in clientsList) {
@@ -79,6 +84,18 @@ namespace PlaneCrush
                     activePlayer = (string)client.Key;
                 }
             }
+        }
+
+        public static byte[] ObjectToByteArray(MessageWrapper obj)
+        {
+            byte[] bytes;
+            using (var _MemoryStream = new MemoryStream())
+            {
+                IFormatter _BinaryFormatter = new BinaryFormatter();
+                _BinaryFormatter.Serialize(_MemoryStream, obj);
+                bytes = _MemoryStream.ToArray();
+            }
+            return bytes;
         }
     }
 }

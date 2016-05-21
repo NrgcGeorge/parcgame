@@ -35,8 +35,6 @@ namespace PlaneCrush
                     if (Server.readyPlayers < 2)
                     {
                         MessageWrapper message = ByteArrayToObject(bytesFrom);
-
-                        msg("Client - " + clientName + ": " + message.PlanesReady);
                         if (message.PlanesReady)
                         {
                             Server.readyPlayers++;
