@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -49,8 +50,6 @@ namespace PlaneCrash
 
                 Stream = client.GetStream();
 
-                ClientName = client.Client.RemoteEndPoint.ToString();
-
                 Thread oThread = new Thread(Listen);
                 oThread.Start();
             }
@@ -88,6 +87,32 @@ namespace PlaneCrash
 
                     }
                 }
+
+                if (responseData.Phase == MessageWrapper.Phases.ATACK)
+                {
+                    this.Dispatcher.Invoke((Action)(() =>
+                    {
+                        foreach (var btn in SelfPlaneMap.Children)
+                        {
+                            var button = btn as CustomButton;
+                            if (button.Uid == responseData.CellToHit.ToString())
+                            {
+                                if (button.IsHead == true)
+                                {
+                                    // to do
+                                    var a = 2;
+                                }
+                                else
+                                {
+                                    var bu = 4;
+                                }
+                            }
+                        }
+
+                    }));
+
+                }
+
             }
         }
 
@@ -395,6 +420,7 @@ namespace PlaneCrash
             if (headBtn != null)
             {
                 headBtn.Background = planeColor;
+                headBtn.IsHead = true;
 
                 CustomButton cellCenterFrontBtn = GetButtonById(planeCoordinates.CellCenterFrontId);
                 cellCenterFrontBtn.Background = planeColor;

@@ -10,5 +10,6 @@ namespace PlaneCrash
     public class CustomButton : Button
     {
         public bool IsSelected { get; set; }
+        public bool IsHead = false;
     }
 }
