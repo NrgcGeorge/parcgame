@@ -142,7 +142,7 @@ namespace PlaneCrash
                         }
                     }));
 
-                    SendMessage(new MessageWrapper() { Points = points, IsPlaneHit = isPlaneHit, Phase = MessageWrapper.Phases.HIT });
+                    SendMessage(new MessageWrapper() { Points = points, IsPlaneHit = isPlaneHit, Phase = MessageWrapper.Phases.HIT} , true);
                     ColorPoints(points, SelfPlaneMap, Brushes.Black);
                 }
 
