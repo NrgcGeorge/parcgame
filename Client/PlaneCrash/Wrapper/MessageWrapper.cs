@@ -26,5 +26,7 @@ namespace Wrapper
         public int[] Points = new int[8];
 
         public bool IsPlaneHit { get; set; }
+
+        public bool Lost { get; set; }
     }
 }

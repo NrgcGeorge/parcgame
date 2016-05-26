@@ -30,6 +30,7 @@ namespace PlaneCrash
         public Direction PlaneDirection { get; set; }
         public NetworkStream Stream;
         public string ClientName { get; set; }
+        public int DeadPlanes { get; set; }
 
         public bool IsMyTurn { get; set; }
 
@@ -37,7 +38,8 @@ namespace PlaneCrash
         {
             InitializeComponent();
             IsMyTurn = false;
-            Connect("192.168.0.171");
+            DeadPlanes = 0;
+            Connect("192.168.137.147");
         }
 
         void Connect(String server)
@@ -127,6 +129,7 @@ namespace PlaneCrash
                                             break;
                                     }
                                     isPlaneHit = true;
+                                    DeadPlanes++;
                                     break;
                                 }
                                 else
@@ -146,9 +149,15 @@ namespace PlaneCrash
                 if (responseData.Phase == MessageWrapper.Phases.HIT)
                 {
                     ColorPoints(responseData.Points, HitTargetMap, responseData.IsPlaneHit ? Brushes.Green : Brushes.Pink);
-                    SendMessage(new MessageWrapper() { Phase = MessageWrapper.Phases.LOSE});
+                    SendMessage(new MessageWrapper() { Phase = MessageWrapper.Phases.LOSE , Lost = DeadPlanes == 3 ? true : false });
                 }
 
+                if (responseData.Phase == MessageWrapper.Phases.LOSE)
+                {
+                    if (responseData.Lost == true) {
+                        MessageBox.Show("You won the game!");
+                    }
+                }
             }
         }
 
@@ -170,10 +179,13 @@ namespace PlaneCrash
             }));
         }
 
-        public void SendMessage(MessageWrapper message)
+        public void SendMessage(MessageWrapper message, bool activate = false)
         {
-            Byte[] data = ObjectToByteArray(message);
-            Stream.Write(data, 0, data.Length);
+            if (activate || IsMyTurn)
+            {
+                Byte[] data = ObjectToByteArray(message);
+                Stream.Write(data, 0, data.Length);
+            }
         }
 
         private MessageWrapper ByteArrayToObject(byte[] arrBytes)
@@ -328,7 +340,7 @@ namespace PlaneCrash
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow)
                             {
-                                SendMessage(new MessageWrapper() { PlanesReady = true });
+                                SendMessage(new MessageWrapper() { PlanesReady = true } , true);
                             }
                         }
                         break;
@@ -343,7 +355,7 @@ namespace PlaneCrash
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow)
                             {
-                                SendMessage(new MessageWrapper() { PlanesReady = true });
+                                SendMessage(new MessageWrapper() { PlanesReady = true }, true);
                             }
                         }
                         break;
@@ -358,7 +370,7 @@ namespace PlaneCrash
                             }
                             if (NumberOfAddedPlanes == 3 && planeColor == Brushes.Yellow)
                             {
-                                SendMessage(new MessageWrapper() { PlanesReady = true });
+                                SendMessage(new MessageWrapper() { PlanesReady = true }, true);
                             }
                         }
                         break;
@@ -373,7 +385,7 @@ namespace PlaneCrash
                             }
                             if (NumberOfAddedPlanes == 3)
                             {
-                                SendMessage(new MessageWrapper() { PlanesReady = true });
+                                SendMessage(new MessageWrapper() { PlanesReady = true }, true);
                             }
                         }
                         break;
