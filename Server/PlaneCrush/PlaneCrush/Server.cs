@@ -19,7 +19,7 @@ namespace PlaneCrush
         static Hashtable clientsList = new Hashtable();
 
         public static int readyPlayers = 0;
-        static string activePlayer;
+        public static string activePlayer;
 
         public void startServer()
         {
@@ -71,8 +71,8 @@ namespace PlaneCrush
 
         public static void sendActivePlayerMsg() {
             MessageWrapper m = new MessageWrapper() {
-                ActivePlayer = Server.activePlayer,
-                Phase = MessageWrapper.Phases.ACKNOWLEDGE
+                ActivePlayer = Server.activePlayer
+                //,Phase = MessageWrapper.Phases.ACKNOWLEDGE
             };
 
             Byte[] message = ObjectToByteArray(m);
