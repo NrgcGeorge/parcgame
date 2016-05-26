@@ -12,7 +12,7 @@ namespace PlaneCrush
 {
     class Server
     {
-        String ServerIP = "192.168.137.147";
+        String ServerIP = "172.20.10.4";
         int ServerPort = 9000;
         TcpListener serverSocket;
         TcpClient clientSocket;
@@ -72,7 +72,7 @@ namespace PlaneCrush
         public static void sendActivePlayerMsg() {
             MessageWrapper m = new MessageWrapper() {
                 ActivePlayer = Server.activePlayer
-                //,Phase = MessageWrapper.Phases.ACKNOWLEDGE
+                ,Phase = MessageWrapper.Phases.ACKNOWLEDGE
             };
 
             Byte[] message = ObjectToByteArray(m);
@@ -82,6 +82,7 @@ namespace PlaneCrush
             foreach (DictionaryEntry client in clientsList) {
                 if (!client.Key.Equals(Server.activePlayer)) {
                     activePlayer = (string)client.Key;
+                    break;
                 }
             }
         }

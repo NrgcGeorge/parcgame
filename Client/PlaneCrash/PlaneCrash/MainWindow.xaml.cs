@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -39,7 +40,7 @@ namespace PlaneCrash
             InitializeComponent();
             IsMyTurn = false;
             DeadPlanes = 0;
-            Connect("192.168.137.147");
+            Connect("172.20.10.4");
         }
 
         void Connect(String server)
@@ -85,15 +86,7 @@ namespace PlaneCrash
 
                 if (responseData.Phase == MessageWrapper.Phases.ACKNOWLEDGE)
                 {
-                    if (responseData.ActivePlayer == ClientName)
-                    {
-                        IsMyTurn = true;
-                    }
-                    else
-                    {
-                        IsMyTurn = false;
-
-                    }
+                    IsMyTurn = responseData.ActivePlayer == ClientName;                   
                 }
 
                 if (responseData.Phase == MessageWrapper.Phases.ATACK)
@@ -135,14 +128,19 @@ namespace PlaneCrash
                                 else
                                 {
                                     button.Background = Brushes.Black;
-                                    isPlaneHit = true;
+                                    //isPlaneHit = true;
                                     break;
                                 }
                             }
                         }
                     }));
-
-                    SendMessage(new MessageWrapper() { Points = points, IsPlaneHit = isPlaneHit, Phase = MessageWrapper.Phases.HIT} , true);
+                    if (DeadPlanes == 3)
+                    {
+                        SendMessage(new MessageWrapper() { Phase = MessageWrapper.Phases.LOSE, Lost = true }, true);
+                    }
+                    else {
+                        SendMessage(new MessageWrapper() { Points = points, IsPlaneHit = isPlaneHit, Phase = MessageWrapper.Phases.HIT}, true);
+                    }
                     ColorPoints(points, SelfPlaneMap, Brushes.Black);
                 }
 
@@ -152,10 +150,10 @@ namespace PlaneCrash
                     SendMessage(new MessageWrapper() { Phase = MessageWrapper.Phases.LOSE , Lost = DeadPlanes == 3 ? true : false });
                 }
 
-                if (responseData.Phase == MessageWrapper.Phases.LOSE)
-                {
-                    if (responseData.Lost == true) {
-                        MessageBox.Show("You won the game!");
+                if (responseData.Phase == MessageWrapper.Phases.END) {
+                    if (DeadPlanes < 3)
+                    {
+                        MessageBox.Show("You won the game! " + ClientName);
                     }
                 }
             }

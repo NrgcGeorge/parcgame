@@ -50,6 +50,11 @@ namespace PlaneCrush
                             Server.broadcastMsg(clientName, bytesFrom);
                             if (message.Phase == MessageWrapper.Phases.LOSE) {
                                 message.Phase = MessageWrapper.Phases.ACKNOWLEDGE;
+                                if (message.Lost) {
+                                    MessageWrapper messageClose = new MessageWrapper() { Phase = MessageWrapper.Phases.END };
+                                    Byte[] byteMessage = Server.ObjectToByteArray(messageClose);
+                                    Server.broadcastMsg("server", byteMessage);
+                                }
                             }
                         }
                         catch (Exception) { }

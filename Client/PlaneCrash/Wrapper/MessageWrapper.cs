@@ -15,7 +15,8 @@ namespace Wrapper
             ACKNOWLEDGE,
             ATACK,
             HIT,
-            LOSE
+            LOSE,
+            END
         }
         public int CellToHit { get; set; }
         public bool PlanesReady { get; set; }
