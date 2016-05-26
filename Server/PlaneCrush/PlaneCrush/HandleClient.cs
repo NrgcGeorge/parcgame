@@ -48,11 +48,14 @@ namespace PlaneCrush
                         {
                             msg("Phase: " + message.Phase);
                             Server.broadcastMsg(clientName, bytesFrom);
+                            if (message.Phase == MessageWrapper.Phases.LOSE) {
+                                message.Phase = MessageWrapper.Phases.ACKNOWLEDGE;
+                            }
                         }
                         catch (Exception) { }
                     }
 
-                    if (message.Phase == MessageWrapper.Phases.ACKNOWLEDGE && Server.readyPlayers == 2)
+                    if ((message.Phase == MessageWrapper.Phases.ACKNOWLEDGE || message.Phase == MessageWrapper.Phases.SENDIP) && Server.readyPlayers == 2)
                     {
                         Server.sendActivePlayerMsg();
                     }

@@ -12,7 +12,7 @@ namespace PlaneCrush
 {
     class Server
     {
-        String ServerIP = "192.168.0.171";
+        String ServerIP = "192.168.137.147";
         int ServerPort = 9000;
         TcpListener serverSocket;
         TcpClient clientSocket;
@@ -58,7 +58,7 @@ namespace PlaneCrush
         {
             foreach (DictionaryEntry client in clientsList)
             {
-                if (!client.Value.Equals(uName))
+                if (!client.Key.Equals(uName))
                 {
                     TcpClient broadcastSocket = (TcpClient)client.Value;
                     NetworkStream broadcastStream = broadcastSocket.GetStream();
